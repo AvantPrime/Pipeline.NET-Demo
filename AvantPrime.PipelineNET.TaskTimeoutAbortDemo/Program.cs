@@ -21,10 +21,10 @@ namespace AvantPrime.PipelineNET.TaskTimeoutAbortDemo
 			// Create a pipeline scheduler using FCFS scheduling
 			var scheduler = new PipelineScheduler
 			(
-				Environment.ProcessorCount,		// Match pipeline count (thread limit) with the number of cores
-				ThreadingMechanism.ThreadPool,	// Use ThreadPool threads (suitable for non-web .NET apps)
-				abortLongRunningTasks: true,	// Set long running tasks to be aborted
-				abortTaskTimeoutInterval: 500,	// Set task timeout monitor interval to 500 milliseconds (1/2 second)
+				Environment.ProcessorCount,			// Match pipeline count (thread limit) with the number of cores
+				new ThreadPoolThreadScheduler(),	// Use ThreadPool threads (suitable for non-web .NET apps)
+				abortLongRunningTasks: true,		// Set long running tasks to be aborted
+				abortTaskTimeoutInterval: 500,		// Set task timeout monitor interval to 500 milliseconds (1/2 second)
 
 				// Custom handler for exceptions that occur inside the task
 				onException: TaskMonitorExceptionLog

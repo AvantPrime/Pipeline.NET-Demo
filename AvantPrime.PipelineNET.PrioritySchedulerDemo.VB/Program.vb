@@ -5,11 +5,11 @@ Module Program
 	Private _activeTasks As Integer
 
 	Sub New()
-		Randomizer = New Random(CInt(DateTime.Now.Ticks))
+		Randomizer = New Random(DateTime.Now.Millisecond)
 	End Sub
 
 	Sub Main(args As String())
-		Dim scheduler = New PipelineScheduler(6, True, True, 1000, False, Nothing, new PriorityScheduler(TimeSpan.FromMilliseconds(500)), 0, TaskQueueOverflow.Append, Nothing, Nothing)
+		Dim scheduler = New PipelineScheduler(6, Nothing, True, 1000, False, Nothing, new PriorityScheduler(TimeSpan.FromMilliseconds(500)), 0, True, 100, TaskQueueOverflow.Append, Nothing, Nothing, Nothing)
 		Const taskCount As Integer = 10
 
 		scheduler.Start()

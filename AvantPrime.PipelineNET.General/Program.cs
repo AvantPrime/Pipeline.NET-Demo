@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AvantPrime.PipelineNET.General
 {
@@ -14,7 +10,7 @@ namespace AvantPrime.PipelineNET.General
 			Console.WriteLine("Starting main application.");
 			Console.WriteLine("Thread Id: {0}", Thread.CurrentThread.ManagedThreadId);
 
-			var pipe = new PipelineScheduler(ThreadingMechanism.ThreadPool);
+			var pipe = new PipelineScheduler(threadScheduler: new ThreadPoolThreadScheduler());
 
 			for (int i = 0; i < 10; i++)
 			{

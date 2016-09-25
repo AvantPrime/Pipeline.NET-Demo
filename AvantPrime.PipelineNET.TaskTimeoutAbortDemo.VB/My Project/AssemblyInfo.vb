@@ -10,10 +10,10 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("AvantPrime.PipelineNET.TaskTimeoutAbortDemo.VB")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
+<Assembly: AssemblyCompany("Avant Prime")> 
 <Assembly: AssemblyProduct("AvantPrime.PipelineNET.TaskTimeoutAbortDemo.VB")> 
-<Assembly: AssemblyCopyright("Copyright ©  2014")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyCopyright("Copyright © Avant Prime 2014")> 
+<Assembly: AssemblyTrademark("Avant Prime")> 
 
 <Assembly: ComVisible(False)>
 
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.0.*")> 
 <Assembly: AssemblyFileVersion("1.0.0.0")> 

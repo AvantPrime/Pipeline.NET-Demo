@@ -6,7 +6,7 @@ Module Program
 
 	Sub Main()
 		_randomizer = New Random(CType(DateTime.Now.Ticks Mod Int32.MaxValue, Integer))
-		Dim scheduler = New PipelineScheduler(6, ThreadingMechanism.ThreadPool, True, 1000, False, 0, Nothing, 0, True, 100, TaskQueueOverflow.Append, Nothing, Nothing, Nothing)
+		Dim scheduler = New PipelineScheduler(6, new ThreadPoolThreadScheduler(), True, 1000, False, 0, Nothing, 0, True, 100, TaskQueueOverflow.Append, Nothing, Nothing, Nothing)
 		Const taskCount As Integer = 10
 
 		' Use IPipelineTask interface to define work.

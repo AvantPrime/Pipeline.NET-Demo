@@ -16,7 +16,7 @@ namespace AvantPrime.PipelineNET.OnComplete
 			var scheduler = new PipelineScheduler
 				(
 					onComplete: OnComplete,
-					threadingMechanism: ThreadingMechanism.Standard,
+					threadScheduler: new StandardThreadScheduler(),
 					taskBufferSize: size,
 					useTaskSchedulingOffloading: false,
 					scheduler: new FcfsScheduler()

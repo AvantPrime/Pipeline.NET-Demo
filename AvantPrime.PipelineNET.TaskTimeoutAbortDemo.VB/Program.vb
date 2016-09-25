@@ -6,7 +6,7 @@ Module Program
 	Private _activeTasks As Integer
 
 	Sub New()
-		Randomizer = New Random(CInt(DateTime.Now.Ticks))
+		Randomizer = New Random(DateTime.Now.Millisecond)
 	End Sub
 
 	Sub Main(args As String())

@@ -8,12 +8,12 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("AvantPrime.PipelineNET.ConsoleDemo2.VB")> 
+<Assembly: AssemblyTitle("AvantPrime.PipelineNET.FcfsDemo2.VB")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("AvantPrime.PipelineNET.ConsoleDemo2.VB")> 
-<Assembly: AssemblyCopyright("Copyright ©  2013")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyCompany("Avant Prime")> 
+<Assembly: AssemblyProduct("AvantPrime.PipelineNET.FcfsDemo2.VB")> 
+<Assembly: AssemblyCopyright("Copyright © Avant Prime 2013")> 
+<Assembly: AssemblyTrademark("Avant Prime")> 
 
 <Assembly: ComVisible(False)>
 
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.0.*")> 
 <Assembly: AssemblyFileVersion("1.0.0.0")> 
