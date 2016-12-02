@@ -49,8 +49,8 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AvantPrime.PipelineNET, Version=2.2.46.0, Culture=neutral, PublicKeyToken=eb4db993bfead47a, processorArchitecture=MSIL">
-      <HintPath>..\packages\AvantPrime.PipelineNET.2.2.46\lib\net45\AvantPrime.PipelineNET.dll</HintPath>
+    <Reference Include="AvantPrime.PipelineNET, Version=2.2.55.0, Culture=neutral, PublicKeyToken=eb4db993bfead47a, processorArchitecture=MSIL">
+      <HintPath>..\packages\AvantPrime.PipelineNET.2.2.55\lib\net45\AvantPrime.PipelineNET.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

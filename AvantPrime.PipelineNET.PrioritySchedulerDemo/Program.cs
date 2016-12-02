@@ -33,7 +33,7 @@ namespace AvantPrime.PipelineNET.PrioritySchedulerDemo
 			scheduler.Dispose();
 		}
 
-		private class CustomTask : IPipelineTask
+		private class CustomTask : ITask
 		{
 			private readonly int _id;
 
@@ -88,6 +88,8 @@ namespace AvantPrime.PipelineNET.PrioritySchedulerDemo
 			/// will ensure that the task is not monitored for termination.
 			/// </summary>
 			public TimeSpan ThreadAbortTimeout { get; set; }
+
+			public bool IsCancelled { get; set; }
 
 			/// <summary>Gets or sets the unique identifier of the task.</summary>
 			/// <remarks>

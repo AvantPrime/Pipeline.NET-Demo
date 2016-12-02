@@ -23,7 +23,7 @@ namespace AvantPrime.PipelineNET.OnFault
 			}
 		}
 
-		static void OnFault(IPipelineTask task, Exception e)
+		static void OnFault(ITask task, Exception e)
 		{
 			if (task != null)
 			{
@@ -40,7 +40,7 @@ namespace AvantPrime.PipelineNET.OnFault
 		}
 	}
 
-	class SolveProblem : IPipelineTask
+	class SolveProblem : ITask
 	{
 		public void Execute()
 		{
@@ -56,6 +56,7 @@ namespace AvantPrime.PipelineNET.OnFault
 		public TaskPriority OriginalPriority { get; set; }
 		public DateTime PriorityBoostTime { get; set; }
 		public TimeSpan ThreadAbortTimeout { get; set; }
+		public bool IsCancelled { get; set; }
 		public Guid Id { get; set; }
 	}
 }

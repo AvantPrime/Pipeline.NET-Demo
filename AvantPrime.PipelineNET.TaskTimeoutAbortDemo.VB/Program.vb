@@ -1,5 +1,4 @@
-﻿Imports System.Diagnostics
-Imports System.Threading
+﻿Imports System.Threading
 
 Module Program
 	Private ReadOnly Randomizer As Random
@@ -14,7 +13,7 @@ Module Program
 
 		' Create a pipeline scheduler supporting 6 concurrent threads
 		' Also support FCFS scheduling
-		Dim scheduler = New PipelineScheduler(5, abortLongRunningTasks:=True, abortTaskTimeoutInterval:=500, onException:= AddressOf TaskMonitorExceptionLog)
+		Dim scheduler = New PipelineScheduler(5, abortLongRunningTasks:=True, abortTaskTimeoutIntervalInMilliseconds:=500, onException:= AddressOf TaskMonitorExceptionLog)
 		Const taskCount As Integer = 15
 
 		' Use IPipelineTask interface to define work.
@@ -44,18 +43,18 @@ Module Program
 		scheduler.Dispose()
 	End Sub
 
-	Private Sub TaskMonitorExceptionLog(task As IPipelineTask, e As Exception)
+	Private Sub TaskMonitorExceptionLog(task As ITask, e As Exception)
 		Console.ForegroundColor = ConsoleColor.Red
 		Console.WriteLine("Task running on thread {0} threw and exception: {1} at {2}.", Thread.CurrentThread.ManagedThreadId, e, DateTime.Now.ToString("hh:mm:ss.fff"))
 		Console.ResetColor()
 	End Sub
 
 	Private Class CustomTask
-		Implements IPipelineTask
+		Implements ITask
 
 #Region "Implementation of IPipelineTask"
 
-		Public Sub Execute() Implements IPipelineTask.Execute
+		Public Sub Execute() Implements ITask.Execute
 			Try
 				Interlocked.Increment(_activeTasks)
 				Dim delay = Randomizer.[Next](2000)
@@ -77,37 +76,39 @@ Module Program
 		''' <summary>
 		''' Gets or sets the date and time the task was added to the queue.
 		''' </summary>
-		Public Property ArrivalTime As Date Implements IPipelineTask.ArrivalTime
+		Public Property ArrivalTime As Date Implements ITask.ArrivalTime
 
 		''' <summary>
 		''' Gets or sets the scheduling priority of a task.
 		''' </summary>
-		Public Property Priority As TaskPriority Implements IPipelineTask.Priority
+		Public Property Priority As TaskPriority Implements ITask.Priority
 
 		''' <summary>
 		''' Gets or sets the details of the task execution.
 		''' </summary>
-		Public Property ExecutionResult As TaskExecutionResult Implements IPipelineTask.ExecutionResult
+		Public Property ExecutionResult As TaskExecutionResult Implements ITask.ExecutionResult
 
 		''' <summary>
 		''' Gets or sets the original scheduling priority of a task.
 		''' </summary>
-		Public Property OriginalPriority As TaskPriority Implements IPipelineTask.OriginalPriority
+		Public Property OriginalPriority As TaskPriority Implements ITask.OriginalPriority
 
 		''' <summary>
 		''' Gets or sets the last date and time the priority
 		''' was boosted.
 		''' </summary>
-		Public Property PriorityBoostTime As Date Implements IPipelineTask.PriorityBoostTime
+		Public Property PriorityBoostTime As Date Implements ITask.PriorityBoostTime
 
 		''' <summary>
 		''' Gets or sets the time to wait before forcefully aborting
 		''' the task. Setting the value to <see cref="TimeSpan.Zero"/> 
 		''' will ensure that the task is not monitored for termination.
 		''' </summary>
-		Public Property ThreadAbortTimeout As TimeSpan Implements IPipelineTask.ThreadAbortTimeout
+		Public Property ThreadAbortTimeout As TimeSpan Implements ITask.ThreadAbortTimeout
 
-		Public Property Id As Guid Implements IPipelineTask.Id
+		Public Property IsCancelled As Boolean Implements ITask.IsCancelled
+
+		Public Property Id As Guid Implements ITask.Id
 
 #End Region
 	End Class

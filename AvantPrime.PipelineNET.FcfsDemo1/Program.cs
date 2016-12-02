@@ -48,7 +48,7 @@ namespace AvantPrime.PipelineNET.FcfsDemo1
 			scheduler.Dispose();
 		}
 
-		private class CustomTask : IPipelineTask
+		private class CustomTask : ITask
 		{
 			private readonly int _id;
 
@@ -77,6 +77,7 @@ namespace AvantPrime.PipelineNET.FcfsDemo1
 			public TaskPriority OriginalPriority { get; set; }
 			public DateTime PriorityBoostTime { get; set; }
 			public TimeSpan ThreadAbortTimeout { get; set; }
+			public bool IsCancelled { get; set; }
 			public Guid Id { get; set; }
 
 			#endregion

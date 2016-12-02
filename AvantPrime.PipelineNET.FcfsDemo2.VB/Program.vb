@@ -9,7 +9,7 @@ Module Program
 	End Sub
 
 	Sub Main(args As String())
-		Dim scheduler = New PipelineScheduler(6, new StandardThreadScheduler(), True, 1000, False, 0, Nothing, Nothing, Nothing)
+		Dim scheduler = New PipelineScheduler(6, new StandardTaskRunner(), True, 1000, Nothing, False, 0, Nothing, Nothing, Nothing)
 		Const taskCount As Integer = 10
 
 		scheduler.Start()

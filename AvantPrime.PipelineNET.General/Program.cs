@@ -10,7 +10,7 @@ namespace AvantPrime.PipelineNET.General
 			Console.WriteLine("Starting main application.");
 			Console.WriteLine("Thread Id: {0}", Thread.CurrentThread.ManagedThreadId);
 
-			var pipe = new PipelineScheduler(threadScheduler: new ThreadPoolThreadScheduler());
+			var pipe = new PipelineScheduler(threadScheduler: new ThreadPoolTaskRunner());
 
 			for (int i = 0; i < 10; i++)
 			{
@@ -25,7 +25,7 @@ namespace AvantPrime.PipelineNET.General
 			pipe.Dispose();
 		}
 
-		class SendMessageTask : IPipelineTask
+		class SendMessageTask : ITask
 		{
 			private readonly string _message;
 
@@ -47,6 +47,7 @@ namespace AvantPrime.PipelineNET.General
 			public TaskPriority OriginalPriority { get; set; }
 			public DateTime PriorityBoostTime { get; set; }
 			public TimeSpan ThreadAbortTimeout { get; set; }
+			public bool IsCancelled { get; set; }
 			public Guid Id { get; set; }
 
 			#endregion
