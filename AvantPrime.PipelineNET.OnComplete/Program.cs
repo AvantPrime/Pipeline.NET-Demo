@@ -16,7 +16,7 @@ namespace AvantPrime.PipelineNET.OnComplete
 			var scheduler = new PipelineScheduler
 				(
 					onComplete: OnComplete,
-					threadingMechanism: ThreadingMechanism.Standard,
+					threadScheduler: new StandardTaskRunner(),
 					taskBufferSize: size,
 					useTaskSchedulingOffloading: false,
 					scheduler: new FcfsScheduler()
@@ -44,7 +44,7 @@ namespace AvantPrime.PipelineNET.OnComplete
 			Console.ReadKey();
 		}
 
-		static void OnComplete(IPipelineTask task)
+		static void OnComplete(ITask task)
 		{
 			_finishedDates.Add(DateTime.Now);
 			//Console.WriteLine("Task {0} finished at {1}.", task.Id, DateTime.Now);

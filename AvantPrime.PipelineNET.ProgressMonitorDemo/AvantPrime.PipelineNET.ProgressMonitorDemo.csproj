@@ -34,9 +34,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AvantPrime.PipelineNET, Version=2.2.14.0, Culture=neutral, PublicKeyToken=eb4db993bfead47a, processorArchitecture=MSIL">
-      <HintPath>..\packages\AvantPrime.PipelineNET.2.2.14\lib\net45\AvantPrime.PipelineNET.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="AvantPrime.PipelineNET, Version=2.2.55.0, Culture=neutral, PublicKeyToken=eb4db993bfead47a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AvantPrime.PipelineNET\AvantPrime.PipelineNET.dll</HintPath>
+    </Reference>
+    <Reference Include="SmartThreadPool">
+      <HintPath>..\packages\AvantPrime.PipelineNET\SmartThreadPool.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

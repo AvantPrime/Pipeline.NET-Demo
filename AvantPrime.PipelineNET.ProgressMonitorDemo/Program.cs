@@ -7,7 +7,7 @@ namespace AvantPrime.PipelineNET.ProgressMonitorDemo
 	class Program
 	{
 		private static readonly object SyncObjRunning = new object();
-		private static readonly Random Randomize = new Random((int)DateTime.Now.Ticks);
+		private static readonly Random Randomize = new Random(DateTime.Now.Millisecond);
 
 		private static int TotalTasks = 658;
 		private static int _tasksCompleted = 0;
@@ -40,7 +40,7 @@ namespace AvantPrime.PipelineNET.ProgressMonitorDemo
 			Console.SetCursorPosition(0, 6);
 			Console.WriteLine("Press any key to quit...");
 			Console.ReadKey();
-			pipe.Stop();
+			pipe.Dispose();
 		}
 
 		static void MyTask(int taskNumber, Action progressUpdate)

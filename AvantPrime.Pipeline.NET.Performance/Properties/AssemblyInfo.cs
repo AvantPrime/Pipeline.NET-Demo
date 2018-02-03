@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AvantPrime.PipelineNET.FcFsDemo1")]
+[assembly: AssemblyTitle("AvantPrime.Pipeline.NET.Performance")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Avant Prime")]
-[assembly: AssemblyProduct("AvantPrime.PipelineNET.FcFsDemo1")]
-[assembly: AssemblyCopyright("Copyright © Avant Prime 2013")]
-[assembly: AssemblyTrademark("Avant Prime")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("AvantPrime.Pipeline.NET.Performance")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2eed2b1e-73b7-4260-b17e-c52853721454")]
+[assembly: Guid("f95e9158-ac29-4327-9076-4ebae9744a67")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

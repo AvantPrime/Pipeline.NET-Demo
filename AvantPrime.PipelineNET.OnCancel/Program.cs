@@ -11,7 +11,7 @@ namespace AvantPrime.PipelineNET.OnCancel
 			var scheduler = new PipelineScheduler
 				(
 					abortLongRunningTasks: true,
-					abortTaskTimeoutInterval: 100,
+					abortTaskTimeoutIntervalInMilliseconds: 100,
 					onException: OnFault,
 					onCancel: OnCancel
 				);
@@ -27,13 +27,13 @@ namespace AvantPrime.PipelineNET.OnCancel
 			}
 		}
 
-		static void OnCancel(IPipelineTask task)
+		static void OnCancel(ITask task)
 		{
 			// Do something when task cancels
 			Console.WriteLine("Task cancelled at {0}.", DateTime.Now);
 		}
 
-		static void OnFault(IPipelineTask task, Exception e)
+		static void OnFault(ITask task, Exception e)
 		{
 			if (task != null)
 			{
@@ -50,7 +50,7 @@ namespace AvantPrime.PipelineNET.OnCancel
 		}
 	}
 
-	class SolveProblem : IPipelineTask
+	class SolveProblem : ITask
 	{
 		private readonly Action<SolveProblem, Exception> _onFault;
 
@@ -76,6 +76,7 @@ namespace AvantPrime.PipelineNET.OnCancel
 		public TaskPriority OriginalPriority { get; set; }
 		public DateTime PriorityBoostTime { get; set; }
 		public TimeSpan ThreadAbortTimeout { get; set; }
+		public bool IsCancelled { get; set; }
 		public Guid Id { get; set; }
 	}
 }

@@ -1,0 +1,913 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AvantPrime.PipelineNET</name>
+    </assembly>
+    <members>
+        <member name="T:AvantPrime.PipelineNET.FcfsScheduler">
+            <summary>
+            First Come First Serve task scheduler.
+            </summary>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            namespace AvantPrime.Example
+            {
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			var scheduler = new PipelineScheduler(3, scheduler: new FcfsScheduler());
+            			scheduler.Push(...);
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.IPipelineTaskScheduler">
+            <summary>
+            Defines methods that perform task scheduling.
+            </summary>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            namespace AvantPrime.Example
+            {
+            	public class CriticalTaskScheduler : IPipelineTaskScheduler
+            	{
+            		public IPipelineTask Next(IEnumerable&lt;IPipelineTask&gt; tasks)
+            		{
+            		}
+            	}
+            
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			var scheduler = new PipelineScheduler(3, scheduler: new CriticalTaskScheduler());
+            			scheduler.Push(...);
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.IPipelineTaskScheduler.Next(System.Collections.Generic.IEnumerable{AvantPrime.PipelineNET.IPipelineTask})">
+            <summary>
+            Gets the next task from the queue.
+            </summary>
+            <param name="tasks">List of tasks to evaluate when find next task.</param>
+            <returns>The next task to process.</returns>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.FcfsScheduler.Next(System.Collections.Generic.IEnumerable{AvantPrime.PipelineNET.IPipelineTask})">
+            <summary>
+            Gets the next task from the queue using First
+            Come First Serve scheduling.
+            </summary>
+            <remarks>
+            The order of the tasks are determine by the <see cref="P:AvantPrime.PipelineNET.IPipelineTask.ArrivalTime"/>.
+            </remarks>
+            <param name="tasks">List of tasks to evaluate when find next task.</param>
+            <returns>The next task to process.</returns>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.InternalPipelineTask">
+            <summary>
+            Represents and internal task that can
+            be scheduled by the <see cref="T:AvantPrime.PipelineNET.WorkPipeline"/>.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.InternalPipelineTask.Task">
+            <summary>
+            Gets or sets the task to execute.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.InternalPipelineTask.Token">
+            <summary>
+            Gets or sets the <see cref="P:AvantPrime.PipelineNET.InternalPipelineTask.Token"/> associated
+            with the task.
+            </summary>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.IPipelineTask">
+            <summary>
+            Defines methods and properties for the task operations 
+            and recording completion details.
+            </summary>
+            <remarks>
+            <para>
+            The <see cref="M:AvantPrime.PipelineNET.IPipelineTask.Execute"/> method is a means of the task
+            performing its function when executed in the pipeline.
+            </para>
+            <para>
+            Implementations can define properties that represent their
+            own state and can interrogate this state during the execution
+            of the <see cref="M:AvantPrime.PipelineNET.IPipelineTask.Execute"/> method.
+            </para>
+            </remarks>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            // <see href="http://www.avantprime.com/product/8/fluent-net-mail" target="_blank">Go to Fluent.NET Mail now</see>.
+            using AvantPrime.Mail;
+            
+            namespace AvantPrime.Example
+            {
+            	public class EmailMessage
+            	{
+            		public string Body { get; set; }
+            		public MailBox[] To { get; set; }
+            		public MailBox From { get; set; }
+            		public object Data { get; set; }
+            		public string Subject { get; set; }
+            		public string SmtpServer { get; set; }
+            	}
+            
+            	public class EmailTask : IPipelineTask
+            	{
+            		EmailMessage _message;
+            
+            		public EmailTask(EmailMessage message)
+            		{
+            			_message = message;
+            		}
+            
+            		public void Execute()
+            		{
+            			// Construct and send the email using
+            			// the Avant Prime Fluent.NET Mail component.
+            			// <see href="http://www.avantprime.com/product/8/fluent-net-mail" target="_blank">Go to Fluent.NET Mail now</see>.
+            			new Mail()
+            				.From(_message.From)
+            				.To(_message.To)
+            				.Subject(_message.Subject)
+            				.Html(new MessageTemplate()
+            						.FromText(_message.Body)
+            						.DataFrom(_message.Data)
+            						.BetweenBraces())
+            				.SmtpServer(_message.SmtpServer)
+            				.WithDefaultCredentials()
+            				.Send();
+            		}
+            	}
+            
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			var scheduler = new PipelineScheduler(3, scheduler: new FcfsScheduler());
+            			EmailMessage[] emails = ...;
+            
+            			foreach(var email in emails)
+            				scheduler.Push(email);
+            
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.IPipelineTask.Execute">
+            <summary>
+            The operation that is run in the pipeline.
+            </summary>
+            <remarks>
+            This represents the task that is executed on 
+            a pipeline/thread.
+            </remarks>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.IPipelineTask.ArrivalTime">
+            <summary>
+            Gets or sets the date and time the task was added to the queue.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.IPipelineTask.Priority">
+            <summary>
+            Gets or sets the scheduling priority of a task.
+            </summary>
+            <remarks>
+            This <see cref="T:AvantPrime.PipelineNET.TaskPriority"/> will change if during 
+            scheduling the priority is boosted.
+            </remarks>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.IPipelineTask.ExecutionResult">
+            <summary>
+            Gets or sets the details of the task execution.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.IPipelineTask.OriginalPriority">
+            <summary>
+            Gets or sets the original scheduling priority of a task.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.IPipelineTask.PriorityBoostTime">
+            <summary>
+            Gets or sets the last date and time the priority
+            was boosted.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.IPipelineTask.ThreadAbortTimeout">
+            <summary>
+            Gets or sets the time to wait before forcefully aborting
+            the task. Setting the value to <see cref="F:System.TimeSpan.Zero"/> 
+            will ensure that the task is not monitored for termination.
+            </summary>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.PriorityScheduler">
+            <summary>
+            Priority scheduler with arrival time-based aging.
+            </summary>
+            <remarks>
+            Tasks are returned based on their <see cref="P:AvantPrime.PipelineNET.IPipelineTask.Priority"/>.
+            The priority of a <see cref="T:AvantPrime.PipelineNET.IPipelineTask"/> is changed when the wait
+            time has elapsed since the <see cref="T:AvantPrime.PipelineNET.TaskPriority"/> was set.
+            </remarks>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            namespace AvantPrime.Example
+            {
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			var scheduler = new PipelineScheduler(3, scheduler: new PriorityScheduler());
+            			scheduler.Push(...);
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PriorityScheduler.#ctor">
+            <summary>
+            Initializes a new instance of a <see cref="T:AvantPrime.PipelineNET.PriorityScheduler"/>.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PriorityScheduler.#ctor(System.TimeSpan)">
+            <summary>
+            Initializes a new instance of a <see cref="T:AvantPrime.PipelineNET.PriorityScheduler"/>
+            with a <paramref name="priorityBoostWaitTime"/> to determine when
+            to change the priority of a task.
+            </summary>
+            <param name="priorityBoostWaitTime">Time to wait before elevating the priority of the task.</param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PriorityScheduler.Next(System.Collections.Generic.IEnumerable{AvantPrime.PipelineNET.IPipelineTask})">
+            <summary>
+            Gets the next task from the queue.
+            </summary>
+            <param name="tasks">List of tasks to evaluate when find next task.</param>
+            <returns>The next task to process.</returns>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.PipelineScheduler">
+            <summary>
+            Allows the scheduling of <see cref="T:AvantPrime.PipelineNET.IPipelineTask"/> tasks
+            which will be executed the scheduler pipelines/threads.
+            </summary>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            namespace AvantPrime.Example
+            {
+            	public class EmailMessage
+            	{
+            		public string Body { get; set; }
+            		public MailBox[] To { get; set; }
+            		public MailBox From { get; set; }
+            		public object Data { get; set; }
+            		public string Subject { get; set; }
+            		public string SmtpServer { get; set; }
+            	}
+            
+            	public class EmailTask : IPipelineTask
+            	{
+            		EmailMessage _message;
+            
+            		public EmailTask(EmailMessage message)
+            		{
+            			_message = message;
+            		}
+            
+            		public void Execute()
+            		{
+            			// Construct and send the email using
+            			// the Avant Prime Fluent.NET Mail component.
+            			// <see href="http://www.avantprime.com/product/8/fluent-net-mail" target="_blank">Go to Fluent.NET Mail now</see>.
+            			new Mail()
+            				.From(_message.From)
+            				.To(_message.To)
+            				.Subject(_message.Subject)
+            				.Html(new MessageTemplate()
+            						.FromText(_message.Body)
+            						.DataFrom(_message.Data)
+            						.BetweenBraces())
+            				.SmtpServer(_message.SmtpServer)
+            				.WithDefaultCredentials()
+            				.Send();
+            		}
+            	}
+            
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			// Create scheduler which will abort any task that
+            			// runs longer than its allotted time. The abort
+            			// monitor will check tasks every 2000ms / 2 seconds.
+            			var scheduler = new PipelineScheduler(6, 
+            									abortLongRunningTasks: true,
+            									abortTaskTimeoutInterval: 2000,
+            									(e) =&gt; Console.WriteLine);
+            
+            			var scheduler = new PipelineScheduler(3, scheduler: new FcfsScheduler());
+            			EmailMessage[] emails = ...;
+            
+            			foreach(var email in emails)
+            			{
+            				// Tasks should not run for more that 2 seconds
+            				task.AbortThreadTimeout = TimeSpan.FromSeconds(2);
+            
+            				scheduler.Push(email);
+            			}
+            
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.#ctor(System.Boolean,System.Boolean,System.Int32,System.Boolean,System.Int32,System.Action{System.Exception},AvantPrime.PipelineNET.IPipelineTaskScheduler,AvantPrime.PipelineNET.IPipelineTask[])">
+            <summary>
+            Initializes a new instance of a <see cref="T:AvantPrime.PipelineNET.PipelineScheduler"/>
+            with the size of the token stack and an initial number of tasks
+            to execute on the pipeline.
+            </summary>
+            <param name="useThreadPool">
+            Indicates whether to use the <see cref="T:System.Threading.ThreadPool"/> or standard <see cref="T:System.Threading.Thread"/>.
+            </param>
+            <param name="wakeUpIntervalInMilliseconds">The interval in milliseconds between wake up events.</param>
+            <param name="abortLongRunningTasks">
+            Indicates whether tasks that have passed their allowed execution time should
+            be terminated. This will only take action if <paramref name="abortTaskTimeoutInterval"/> is
+            greater than 0.
+            </param>
+            <param name="abortTaskTimeoutInterval">
+            The interval in milliseconds between task abort events. This responds to the
+            <see cref="P:AvantPrime.PipelineNET.IPipelineTask.ThreadAbortTimeout"/> setting which indicates that tasks
+            should be aborted if the still running after the specified duration.
+            </param>
+            <param name="threadAbortExceptionSubscriber">
+            An <see cref="T:System.Action"/> that will be called whenever there is an <see cref="T:System.Exception"/> 
+            thrown in the task monitoring <see cref="T:AvantPrime.PipelineNET.TaskMonitor"/> (the component used to terminate
+            tasks that have passed their allowed execute time).
+            </param>
+            <param name="scheduler">
+            The task scheduling class. Defaults to <see cref="T:AvantPrime.PipelineNET.FcfsScheduler"/> if no
+            scheduler if specified. The <see cref="T:AvantPrime.PipelineNET.PriorityScheduler"/> class is also
+            available for scheduling.
+            </param>
+            <param name="tasks">Task to execute on the pipeline.</param>
+            <param name="autoWakeUp">
+            Indicates whether to use an auto wake up event for potential 
+            tasks stuck in the pipeline.
+            </param>
+            <remarks>
+            The number of pipelines defaults to the number of logical processors. 
+            See <see cref="P:System.Environment.ProcessorCount"/>.
+            </remarks>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.#ctor(System.Int32,System.Boolean,System.Boolean,System.Int32,System.Boolean,System.Int32,System.Action{System.Exception},AvantPrime.PipelineNET.IPipelineTaskScheduler,AvantPrime.PipelineNET.IPipelineTask[])">
+            <summary>
+            Initializes a new instance of a <see cref="T:AvantPrime.PipelineNET.PipelineScheduler"/>
+            with the size of the token stack and an initial number of tasks
+            to execute on the pipeline.
+            </summary>
+            <param name="pipelines">Size of the token stack.</param>
+            <param name="useThreadPool">
+            Indicates whether to use the <see cref="T:System.Threading.ThreadPool"/> or standard <see cref="T:System.Threading.Thread"/>.
+            </param>
+            <param name="wakeUpIntervalInMilliseconds">The interval in milliseconds between wake up events.</param>
+            <param name="abortLongRunningTasks">
+            Indicates whether tasks that have passed their allowed execution time should
+            be terminated. This will only take action if <paramref name="abortTaskTimeoutInterval"/> is
+            greater than 0.
+            </param>
+            <param name="abortTaskTimeoutInterval">
+            The interval in milliseconds between task abort events. This responds to the
+            <see cref="P:AvantPrime.PipelineNET.IPipelineTask.ThreadAbortTimeout"/> setting which indicates that tasks
+            should be aborted if the still running after the specified duration.
+            </param>
+            <param name="threadAbortExceptionSubscriber">
+            An <see cref="T:System.Action"/> that will be called whenever there is an <see cref="T:System.Exception"/> 
+            thrown in the task monitoring <see cref="T:AvantPrime.PipelineNET.TaskMonitor"/> (the component used to terminate
+            tasks that have passed their allowed execute time).
+            </param>
+            <param name="scheduler">
+            The task scheduling class. Defaults to <see cref="T:AvantPrime.PipelineNET.FcfsScheduler"/> if no
+            scheduler if specified. The <see cref="T:AvantPrime.PipelineNET.PriorityScheduler"/> class is also
+            available for scheduling.</param>
+            <param name="tasks">Task to execute on the pipeline.</param>
+            <param name="autoWakeUp">
+            Indicates whether to use an auto wake up event for potential 
+            tasks stuck in the pipeline.
+            </param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.Push(AvantPrime.PipelineNET.IPipelineTask)">
+            <summary>
+            Adds a task to the task pipeline.
+            </summary>
+            <param name="task">The <see cref="T:AvantPrime.PipelineNET.IPipelineTask"/> to be added to the pipeline.</param>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            namespace AvantPrime.Example
+            {
+            	public class SendEmailTask : IPipelineTask {
+            		public SendEmailTask(Email email) {
+            
+            		}
+            
+            		public void Execute() {
+            			// Send email here
+            		}
+            	}
+            
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			// Create scheduler with a maximum of 6 pipelines
+            			var scheduler = new PipelineScheduler(6);
+            
+            			while(EmailQueue.IsNotEmpty) {
+            				var task = new SendEmailTask(EmailQueue.Next());
+            				scheduler.Push(task);
+            			}
+            
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.Push(System.Action)">
+            <summary>
+            Adds a task to the task pipeline.
+            </summary>
+            <param name="task">The <see cref="T:System.Action"/> to be added to the task pipeline.</param>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            namespace AvantPrime.Example
+            {
+            	public class SendEmailTask : IPipelineTask {
+            		public SendEmailTask(Email email) {
+            
+            		}
+            
+            		public void Execute() {
+            			// Send email here
+            		}
+            	}
+            
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			// Create scheduler with a maximum of 6 pipelines
+            			var scheduler = new PipelineScheduler(6);
+            
+            			while(EmailQueue.IsNotEmpty) {
+            				scheduler.Push(() =&gt; DoWork());
+            			}
+            
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            		}
+            
+            		public static void DoWork() {
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.GetNextToken">
+            <summary>
+            Gets the next available <see cref="T:AvantPrime.PipelineNET.Token"/>.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.WakeUpEvent">
+            <summary>
+            Wakes up the scheduler if for some reason it 
+            has got stuck and keep pushing available tasks
+            into its pipeline.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.ScheduleTask">
+            <summary>
+            Schedules a task for execution in the pipeline.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, 
+            releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.Dispose(System.Boolean)">
+            <summary>
+            Performs application-defined tasks associated with freeing, 
+            releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.IsTokenAvailable">
+            <summary>
+            Gets whether a token is available to be
+            assigned to a new task.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.IsTaskAvailable">
+            <summary>
+            Gets whether a task is waiting in the queue.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.PipelineScheduler.InternalTask.Execute">
+            <summary>
+            The operation that is run in the pipeline.
+            </summary>
+            <remarks>
+            This represents the task that is executed on 
+            a pipeline/thread.
+            </remarks>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.InternalTask.ArrivalTime">
+            <summary>
+            Gets or sets the date and time the task was added to the queue.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.InternalTask.Priority">
+            <summary>
+            Gets or sets the scheduling priority of a task.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.InternalTask.ExecutionResult">
+            <summary>
+            Gets or sets the details of the task execution.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.InternalTask.OriginalPriority">
+            <summary>
+            Gets or sets the original scheduling priority of a task.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.InternalTask.PriorityBoostTime">
+            <summary>
+            Gets or sets the last date and time the priority
+            was boosted.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.PipelineScheduler.InternalTask.ThreadAbortTimeout">
+            <summary>
+            Gets or sets the time to wait before forcefully aborting
+            the task.
+            </summary>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.TaskExecutionResult">
+            <summary>
+            Stores the details surrounding the execution
+            of a <see cref="T:AvantPrime.PipelineNET.IPipelineTask"/>.
+            </summary>
+            <example>
+            <code lang="C#">
+            using System;
+            using AvantPrime.PipelineNET;
+            
+            namespace AvantPrime.Example
+            {
+            	public class Program
+            	{
+            		public static void Main()
+            		{
+            			var scheduler = new PipelineScheduler(3);
+            			IPipelineTask[] tasks = ...;
+            
+            			foreach(var task in tasks)
+            				scheduler.Push(task);
+            
+            			Console.WriteLine("
+            			Console.WriteLine("Press any key to exit...");
+            			Console.ReadKey();
+            			scheduler.Dispose();
+            
+            			foreach(var task in tasks)
+            			{
+            				Console.WriteLine("Was Started: {0}", task.ExecutionResult.Started);
+            				Console.WriteLine("Started at: {0}", task.ExecutionResult.StartTime);
+            				Console.WriteLine("Was Completed: {0}", task.ExecutionResult.Completed);
+            				Console.WriteLine("Completed at: {0}", task.ExecutionResult.CompletionDate);
+            			}
+            		}
+            	}
+            }
+            </code>
+            </example>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.TaskExecutionResult.Completed">
+            <summary>
+            Gets or sets whether the task has been completed.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.TaskExecutionResult.CompletionDate">
+            <summary>
+            Gets or sets the task completion date.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.TaskExecutionResult.StartTime">
+            <summary>
+            Gets or sets the date and time the task execution started.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.TaskExecutionResult.Started">
+            <summary>
+            Gets or sets whether the task execution has started.
+            </summary>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.TaskPriority">
+            <summary>
+            Specifies the scheduling priority of a Task.
+            </summary>
+        </member>
+        <member name="F:AvantPrime.PipelineNET.TaskPriority.Normal">
+            <summary>
+            The task can be scheduled after tasks with AboveNormal 
+            priority and before those with BelowNormal priority. 
+            Tasks have Normal priority by default.
+            </summary>
+        </member>
+        <member name="F:AvantPrime.PipelineNET.TaskPriority.Lowest">
+            <summary>
+            The task can be scheduled after threads with any 
+            other priority.
+            </summary>
+        </member>
+        <member name="F:AvantPrime.PipelineNET.TaskPriority.Highest">
+            <summary>
+            The task can be scheduled before threads with any 
+            other priority.
+            </summary>
+        </member>
+        <member name="F:AvantPrime.PipelineNET.TaskPriority.AboveNormal">
+            <summary>
+            The task can be scheduled after tasks with Highest 
+            priority and before those with Normal priority.
+            </summary>
+        </member>
+        <member name="F:AvantPrime.PipelineNET.TaskPriority.BelowNormal">
+            <summary>
+            The task can be scheduled after tasks with Normal 
+            priority and before those with Lowest priority.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.Monitor(System.WeakReference,AvantPrime.PipelineNET.InternalPipelineTask)">
+            <summary>
+            Adds a new <see cref="T:AvantPrime.PipelineNET.InternalPipelineTask"/> and
+            its associated <see cref="T:System.Threading.Thread"/> to the timeout 
+            monitoring queue.
+            </summary>
+            <param name="thread">The <see cref="T:System.Threading.Thread"/> that the task is currently executing on.</param>
+            <param name="task">The <see cref="T:AvantPrime.PipelineNET.InternalPipelineTask"/> that is to be monitored.</param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.LaunchMonitor">
+            <summary>
+            Launches the monitoring <see cref="T:System.Threading.Thread"/>.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.StopMonitor">
+            <summary>
+            Stops the monitoring <see cref="T:System.Threading.Thread"/> gracefully.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.Monitor">
+            <summary>
+            Monitors and terminates <see cref="T:AvantPrime.PipelineNET.InternalPipelineTask"/>
+            that have passed their alloted execution duration.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.CleanupCompletedThreads">
+            <summary>
+            Removes all the dead and completed tasks or tasks.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.LogException(System.Exception)">
+            <summary>
+            Alerts all subscribers to the <see cref="E:AvantPrime.PipelineNET.TaskMonitor.OnException"/>
+            event handler than an <see cref="T:System.Exception"/> has been
+            thrown.
+            </summary>
+            <param name="exception">The <see cref="T:System.Exception"/> that was thrown.</param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, 
+            releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TaskMonitor.Dispose(System.Boolean)">
+            <summary>
+            Performs application-defined tasks associated with freeing, 
+            releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.TaskMonitor.IsMonitorActive">
+            <summary>
+            Gets or sets the flag showing if the monitoring
+            thread is active.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.WorkPipeline.SetupExecutionStartupState(AvantPrime.PipelineNET.TaskExecutionResult)">
+            <summary>
+            Set the startup state of the <see cref="T:AvantPrime.PipelineNET.TaskExecutionResult"/>.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.WorkPipeline.SetupExecutionCompletionState(AvantPrime.PipelineNET.TaskExecutionResult)">
+            <summary>
+            Set the completion state of the <see cref="T:AvantPrime.PipelineNET.TaskExecutionResult"/>.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.WorkPipeline.ReleaseToken(AvantPrime.PipelineNET.Token)">
+            <summary>
+            Release the <see cref="T:AvantPrime.PipelineNET.Token"/> back into the pool
+            otherwise this token will be lost until
+            the GC cleans it up.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.WorkPipeline.FinaliseTaskExecution(AvantPrime.PipelineNET.InternalPipelineTask)">
+            <summary>
+            Executes all the completion steps for finalising a task
+            execution.
+            </summary>
+            <param name="pipelineTask"></param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.WorkPipeline.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, 
+            releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.WorkPipeline.Dispose(System.Boolean)">
+            <summary>
+            Performs application-defined tasks associated with freeing, 
+            releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.Token">
+            <summary>
+            Represents a object that allows tasks access
+            to the pipeline.
+            </summary>
+            <remarks>
+            Tokens are used to get access to the task pipeline and
+            returned to the task queue on <see cref="M:AvantPrime.PipelineNET.Token.Dispose"/>.
+            </remarks>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.#ctor">
+            <summary>
+            Initializes a new instance of a <see cref="T:AvantPrime.PipelineNET.Token"/>.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.#ctor(System.Action{AvantPrime.PipelineNET.Token})">
+            <summary>
+            Initializes a new instance of a <see cref="T:AvantPrime.PipelineNET.Token"/>
+            with a <paramref name="cleanup"/> operation.
+            </summary>
+            <param name="cleanup">
+            The delegate that is executed during the cleanup of the <see cref="T:AvantPrime.PipelineNET.Token"/>.
+            </param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.#ctor(System.Guid,System.Action{AvantPrime.PipelineNET.Token})">
+            <summary>
+            Initializes a new instance of a <see cref="T:AvantPrime.PipelineNET.Token"/>
+            with a unique <paramref name="id "/> and <paramref name="cleanup"/> operation.
+            </summary>
+            <param name="id">A unique id identifying the <see cref="T:AvantPrime.PipelineNET.Token"/>.</param>
+            <param name="cleanup">
+            The delegate that is executed during the cleanup of the <see cref="T:AvantPrime.PipelineNET.Token"/>.
+            </param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.Dispose">
+            <summary>
+            Performs application-defined tasks associated with 
+            freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.Equals(AvantPrime.PipelineNET.Token)">
+            <summary>
+            Indicates whether the current <see cref="T:AvantPrime.PipelineNET.Token"/> is equal to another <see cref="T:AvantPrime.PipelineNET.Token"/> of the same type.
+            </summary>
+            <returns>
+            True if the current <see cref="T:AvantPrime.PipelineNET.Token"/> is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An <see cref="T:AvantPrime.PipelineNET.Token"/> to compare with this object.</param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.Clone">
+            <summary>
+            Creates a new <see cref="T:AvantPrime.PipelineNET.Token"/> that is a copy of the current instance.
+            </summary>
+            <returns>
+            A new <see cref="T:AvantPrime.PipelineNET.Token"/> that is a copy of this instance.
+            </returns>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:AvantPrime.PipelineNET.Token"/>.
+            </summary>
+            <returns>
+            True if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:AvantPrime.PipelineNET.Token"/>; otherwise, false.
+            </returns>
+            <param name="obj">The object to compare with the current <see cref="T:AvantPrime.PipelineNET.Token"/>.</param>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.Token.GetHashCode">
+            <summary>
+            Serves as a hash function for a this <see cref="T:AvantPrime.PipelineNET.Token"/>. 
+            </summary>
+            <returns>
+            A hash code for the current <see cref="T:AvantPrime.PipelineNET.Token"/>.
+            </returns>
+        </member>
+        <member name="T:AvantPrime.PipelineNET.TokenProducer">
+            <summary>
+            Manipulates a list of self generated tokens. This class
+            is intended for internal user only.
+            </summary>
+            <remarks>
+            Intended to produce a list of tokens that can be issued
+            to a client using the <see cref="P:AvantPrime.PipelineNET.TokenProducer.Token"/> property and
+            regenerated to the New Token Event supplied during 
+            construction.
+            </remarks>
+        </member>
+        <member name="F:AvantPrime.PipelineNET.TokenProducer._tokens">
+            <summary>
+            Stores the tokens
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TokenProducer.#ctor(System.Int32,System.Action)">
+            <summary>
+            Generate the set of keys to distribute 
+            to clients.
+            </summary>
+        </member>
+        <member name="M:AvantPrime.PipelineNET.TokenProducer.ReplaceToken(AvantPrime.PipelineNET.Token)">
+            <summary>
+            This is called when an  is 
+            being disposed. Adds the client disposed 
+            back to the available list for re-distribution.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.TokenProducer.TokenCount">
+            <summary>
+            Gets the number of available tokens.
+            </summary>
+        </member>
+        <member name="P:AvantPrime.PipelineNET.TokenProducer.Token">
+            <summary>
+            Adds new token to the pool or gets a token
+            from the pool. When getting token, if none
+            is available then null is returned.
+            </summary>
+        </member>
+    </members>
+</doc>

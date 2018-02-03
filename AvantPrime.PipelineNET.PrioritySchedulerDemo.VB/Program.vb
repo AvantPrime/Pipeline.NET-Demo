@@ -5,11 +5,11 @@ Module Program
 	Private _activeTasks As Integer
 
 	Sub New()
-		Randomizer = New Random(CInt(DateTime.Now.Ticks))
+		Randomizer = New Random(DateTime.Now.Millisecond)
 	End Sub
 
 	Sub Main(args As String())
-		Dim scheduler = New PipelineScheduler(6, True, True, 1000, False, Nothing, new PriorityScheduler(TimeSpan.FromMilliseconds(500)), 0, TaskQueueOverflow.Append, Nothing, Nothing)
+		Dim scheduler = New PipelineScheduler(6, Nothing, True, 1000, new PriorityScheduler(TimeSpan.FromMilliseconds(500)), 0, False, 100, TaskQueueOverflow.Append, Nothing, Nothing, Nothing)
 		Const taskCount As Integer = 10
 
 		scheduler.Start()
@@ -27,7 +27,7 @@ Module Program
 	End Sub
 
 	Private Class CustomTask
-		Implements IPipelineTask
+		Implements ITask
 		Private ReadOnly _identifier As Integer
 
 		Public Sub New(identifier As Integer)
@@ -36,7 +36,7 @@ Module Program
 
 #Region "Implementation of IPipelineTask"
 
-		Public Sub Execute() Implements IPipelineTask.Execute
+		Public Sub Execute() Implements ITask.Execute
 			Interlocked.Increment(_activeTasks)
 			Dim delay = Randomizer.[Next](3000)
 			Console.WriteLine("Starting task {0}, {1} with duration of {2}ms. Thread: {3}. Priority: {4}. Active: {5}.", _identifier, DateTime.Now.ToString("hh:mm:ss.fff"), delay, Thread.CurrentThread.ManagedThreadId, Priority, _
@@ -51,31 +51,32 @@ Module Program
 		''' <summary>
 		''' Gets or sets the date and time the task was added to the queue.
 		''' </summary>
-		Public Property ArrivalTime() As DateTime Implements IPipelineTask.ArrivalTime
+		Public Property ArrivalTime() As DateTime Implements ITask.ArrivalTime
 
 		''' <summary>
 		''' Gets or sets the scheduling priority of a task.
 		''' </summary>
-		Public Property Priority() As TaskPriority Implements IPipelineTask.Priority
+		Public Property Priority() As TaskPriority Implements ITask.Priority
 
 		''' <summary>
 		''' Gets or sets the details of the task execution.
 		''' </summary>
-		Public Property ExecutionResult() As TaskExecutionResult Implements IPipelineTask.ExecutionResult
+		Public Property ExecutionResult() As TaskExecutionResult Implements ITask.ExecutionResult
 
 		''' <summary>
 		''' Gets or sets the original scheduling priority of a task.
 		''' </summary>
-		Public Property OriginalPriority() As TaskPriority Implements IPipelineTask.OriginalPriority
+		Public Property OriginalPriority() As TaskPriority Implements ITask.OriginalPriority
 
 		''' <summary>
 		''' Gets or sets the last date and time the priority
 		''' was boosted.
 		''' </summary>
-		Public Property PriorityBoostTime() As DateTime Implements IPipelineTask.PriorityBoostTime
+		Public Property PriorityBoostTime() As DateTime Implements ITask.PriorityBoostTime
 
-		Public Property ThreadAbortTimeout() As TimeSpan Implements IPipelineTask.ThreadAbortTimeout
-		Public Property Id As Guid Implements IPipelineTask.Id
+		Public Property ThreadAbortTimeout() As TimeSpan Implements ITask.ThreadAbortTimeout
+		Public Property IsCancelled As Boolean Implements ITask.IsCancelled
+		Public Property Id As Guid Implements ITask.Id
 
 #End Region
 	End Class

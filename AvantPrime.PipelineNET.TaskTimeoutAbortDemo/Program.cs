@@ -21,10 +21,10 @@ namespace AvantPrime.PipelineNET.TaskTimeoutAbortDemo
 			// Create a pipeline scheduler using FCFS scheduling
 			var scheduler = new PipelineScheduler
 			(
-				Environment.ProcessorCount,		// Match pipeline count (thread limit) with the number of cores
-				ThreadingMechanism.ThreadPool,	// Use ThreadPool threads (suitable for non-web .NET apps)
-				abortLongRunningTasks: true,	// Set long running tasks to be aborted
-				abortTaskTimeoutInterval: 500,	// Set task timeout monitor interval to 500 milliseconds (1/2 second)
+				Environment.ProcessorCount,			// Match pipeline count (thread limit) with the number of cores
+				new ThreadPoolTaskRunner(),	// Use ThreadPool threads (suitable for non-web .NET apps)
+				abortLongRunningTasks: true,		// Set long running tasks to be aborted
+				abortTaskTimeoutIntervalInMilliseconds: 500,		// Set task timeout monitor interval to 500 milliseconds (1/2 second)
 
 				// Custom handler for exceptions that occur inside the task
 				onException: TaskMonitorExceptionLog
@@ -72,14 +72,14 @@ namespace AvantPrime.PipelineNET.TaskTimeoutAbortDemo
 			scheduler.Dispose();
 		}
 
-		private static void TaskMonitorExceptionLog(IPipelineTask task, Exception e)
+		private static void TaskMonitorExceptionLog(ITask task, Exception e)
 		{
 			Console.ForegroundColor = ConsoleColor.Red;
 			Console.WriteLine("Task running on thread {0} threw and exception: {1} at {2}.", Thread.CurrentThread.ManagedThreadId, e, DateTime.Now.ToString("hh:mm:ss.fff"));
 			Console.ResetColor();
 		}
 
-		private class CustomTask : IPipelineTask
+		private class CustomTask : ITask
 		{
 			private readonly int _id;
 
@@ -147,6 +147,8 @@ namespace AvantPrime.PipelineNET.TaskTimeoutAbortDemo
 			/// will ensure that the task is not monitored for termination.
 			/// </summary>
 			public TimeSpan ThreadAbortTimeout { get; set; }
+
+			public bool IsCancelled { get; set; }
 
 			public Guid Id { get; set; }
 
